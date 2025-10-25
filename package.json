@@ -1,0 +1,19 @@
+{
+  "name": "xemory-mvp",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently \"npm --workspace apps/api run dev\" \"npm --workspace apps/web run dev\"",
+    "lint": "echo \"No lint script defined yet\"",
+    "typecheck": "echo \"No typecheck script defined yet\"",
+    "build": "echo \"No build script defined yet\"",
+    "test": "echo \"No tests defined yet\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.1",
+    "turbo": "^1.10.0"
+  }
+}
