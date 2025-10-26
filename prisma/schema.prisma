@@ -1,0 +1,95 @@
+// Xemory Database Schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  vcrSessions VCRSession[]
+  personas    Persona[]
+}
+
+model VCRSession {
+  id              String   @id @default(cuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  expressionData  Json     // Stores array of facial expression data points
+  completedAt     DateTime @default(now())
+  
+  @@index([userId])
+}
+
+model Persona {
+  id                String   @id @default(cuid())
+  userId            String
+  user              User     @relation(fields: [userId], references: [id])
+  
+  // Basic info
+  name              String
+  yearOfDeath       Int?
+  occupation        String?
+  
+  // Questionnaire data
+  personalityTraits Json
+  communicationStyle Json
+  commonPhrases     String[]
+  
+  // VCR-derived data
+  emotionalProfile  Json     // Optimism, empathy, etc.
+  
+  // AI prompt data
+  corePrompt        String   @db.Text
+  
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  relationships     Relationship[]
+  conversations     Conversation[]
+  
+  @@index([userId])
+}
+
+model Relationship {
+  id          String   @id @default(cuid())
+  personaId   String
+  persona     Persona  @relation(fields: [personaId], references: [id])
+  
+  // Relationship details
+  personName  String
+  nickname    String?
+  tone        String?
+  commonTopics String[]
+  insideJokes  String[]
+  
+  // Relational prompt modifier
+  promptModifier String @db.Text
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([personaId])
+}
+
+model Conversation {
+  id          String   @id @default(cuid())
+  personaId   String
+  persona     Persona  @relation(fields: [personaId], references: [id])
+  
+  messages    Json     // Array of {role, content, timestamp}
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([personaId])
+}
+
